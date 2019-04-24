@@ -1,0 +1,27 @@
+{
+    "name": "artisan/laravel-settings",
+    "description": "A settings package for Laravel using property bags.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jaggy",
+            "email": "jaggy@artisan.studio"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^5.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Artisan\\Settings\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Artisan\\Settings\\ServiceProvider"
+            ]
+        }
+    }
+}
