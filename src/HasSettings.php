@@ -13,7 +13,12 @@ trait HasSettings
         return $this->morphMany(Models\Settings::class, 'configurable');
     }
 
-    public function settings($fields = [])
+    public function getSettingsAttribute()
+    {
+        return $this->settings();
+    }
+
+    public function settings()
     {
         $instance = $this->instance();
 
