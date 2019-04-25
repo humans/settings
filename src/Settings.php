@@ -2,6 +2,9 @@
 
 namespace Artisan\Settings;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Fluent;
+
 class Settings
 {
     protected $defaults = [];
@@ -30,6 +33,21 @@ class Settings
             ->model
             ->properties()
             ->where('key', $attribute)
-            ->value('value') ?? $default;
+            ->value('value') ?? $default ?? Arr::get($this->defaults, $attribute);
+    }
+
+    public function all()
+    {
+        $settings = [];
+
+        collect($this->defaults)->map(function ($value, $key) {
+            return new Fluent(compact('key', 'value'));
+        })->merge(
+            $this->model->properties
+        )->each(function ($property) use (&$settings) {
+            Arr::set($settings, $property->key, $property->value);
+        });
+
+        return $settings;
     }
 }
