@@ -1,0 +1,16 @@
+<?php
+
+namespace DummyNamespace;
+
+use Artisan\Settings\Settings;
+
+class DummySettingsClass extends Settings
+{
+    protected $defaults = [
+        // ...
+    ];
+
+    protected $casts = [
+        // ...
+    ];
+}
