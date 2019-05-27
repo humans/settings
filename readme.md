@@ -97,8 +97,38 @@ class UserSettings
     ];
 
     protected $casts = [
-        'notification.sms' => 'boolean',
-        'notification.email' => 'boolean',
+        'notifications' => [
+            'sms' => 'boolean',
+        ]
     ];
+}
+```
+
+For custom casts, just in case, you can add a new method to apply the cast.
+
+```php
+<?php
+
+namespace App\Settings;
+
+class UserSettings
+{
+    protected $defaults = [
+        'notifications' => [
+            'sms' => false,
+            'email' => true,
+        ],
+    ];
+
+    protected $casts = [
+        'notifications' => [
+            'sms' => 'some_custom_cast',
+        ]
+    ];
+
+    protected function castSomeCustomCast($value)
+    {
+        return 'transformed value here';
+    }
 }
 ```

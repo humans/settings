@@ -22,15 +22,15 @@ class MakeSettingsCommand extends Command
     public function handle()
     {
         $directory = $this->directory();
+        $file = $directory . DIRECTORY_SEPARATOR . $this->argument('name') . '.php';
 
         if (! File::exists($directory)) {
             File::makeDirectory($directory, 0755, $recursive = true);
         }
 
-        File::put(
-            $directory . DIRECTORY_SEPARATOR . $this->argument('name') . '.php',
-            $this->stub()
-        );
+        if (! File::exists($file)) {
+            File::put($file, $this->stub());
+        }
     }
 
     protected function stub()
