@@ -2,6 +2,16 @@
 
 This package helps to apply settings to models within a Laravel application. This uses the **property bag** pattern to have a single table for your all your model settings.
 
+```php
+class UserSettings extends Artisan\Settings\Settings
+{
+    protected $defaults = ['test' => 'hello'];
+}
+
+User::first()->settings->get('test'); // hello
+User::first()->settings->get('random', 'default-value'); // default-value
+```
+
 ## Installation
 Pull in the package.
 
@@ -11,9 +21,15 @@ composer require artisan/laravel-settings
 
 Next up is we'll publish the config.
 
-```
+```sh
 php artisan vendor:publish --provider="Artisan\Settings\ServiceProvider"
 ```
+
+Migrate the settings table.
+
+```sh
+php artisan migrate
+``
 
 ## Usage
 Create a settings file for your model.
@@ -36,6 +52,16 @@ class Workspace extends Model
 {
     use HasSettings;
 }
+```
+
+Don't forget to map your settings file in `laravel-settings.php`!!!
+
+```php
+return [
+    'classes' => [
+        App\User::class => App\Settings\UserSettings::class,
+    ],
+];
 ```
 
 ## `get($key, $default = null)`
