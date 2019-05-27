@@ -4,6 +4,7 @@ namespace Artisan\Settings;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 
 class Settings
 {
@@ -43,11 +44,35 @@ class Settings
         collect($this->defaults)->map(function ($value, $key) {
             return new Fluent(compact('key', 'value'));
         })->merge(
-            $this->model->properties
+            $this->model->properties->map(function ($property) {
+                $property->value = $this->cast($property);
+
+                return $property;
+            })
         )->each(function ($property) use (&$settings) {
             Arr::set($settings, $property->key, $property->value);
         });
 
         return $settings;
+    }
+
+    protected function cast($property)
+    {
+        if (! $cast = Arr::get($this->casts, $property->key)) {
+            return $property->value;
+        }
+
+        $method = 'cast' . Str::studly($cast);
+
+        if (! method_exists($this, $method)) {
+            return $property->value;
+        }
+
+        return $this->{$method}($property->value);
+    }
+
+    protected function castBoolean($value)
+    {
+        return $value !== '0';
     }
 }
