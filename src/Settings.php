@@ -32,6 +32,13 @@ class Settings
     protected $settings;
 
     /**
+     * The model to apply the settings to.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    protected $model;
+
+    /**
      * Create a settings instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -39,22 +46,72 @@ class Settings
      */
     public function __construct(Model $model)
     {
-        $this->settings = $this->settings($model);
+        $this->model = $model;
+
+        $this->settings = $this->parseSettings();
+    }
+
+    /**
+     * Get the settings by key with a default fallback.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function get($key, $default = null)
+    {
+        return Arr::get($this->settings, $key, $default);
+    }
+
+    /**
+     * Persist the change of multiple attributes in the database.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function update($attribute = [])
+    {
+        Collection::make(
+            Arr::dot($attribute)
+        )->each(function ($value, $key) {
+            $this->set($key, $value);
+        });
+    }
+
+    /**
+     * Persist a change for a single attribute.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return void
+     */
+    public function set($key, $value)
+    {
+        $this->model->properties()->updateOrCreate(['key' => $key], ['value' => $value]);
+    }
+
+    /**
+     * Get the settings array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->settings->toArray();
     }
 
     /**
      * Build the settings file from the database and merge the defaults. This
      * also applies the cast with the default values.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\Collection
      */
-    private function settings(Model $model)
+    private function parseSettings()
     {
         return Collection::make(
             Arr::dot($this->defaults)
         )->merge(
-            $model->properties()->get()->mapWithKeys(function ($property) {
+            $this->model->properties()->get()->mapWithKeys(function ($property) {
                 return [$property->key => $property->value];
             })
         )->mapWithKeys(function ($value, $key) {
@@ -72,27 +129,5 @@ class Settings
 
             return Collection::make($settings);
         });
-    }
-
-    /**
-     * Get the settings by key with a default fallback.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public function get($key, $default = null)
-    {
-        return Arr::get($this->settings, $key, $default);
-    }
-
-    /**
-     * Get the settings array.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return $this->settings->toArray();
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Tests\Unit;
 
-use Artisan\Settings\Settings;
+use Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Fluent;
 use Mockery;
-use Tests\TestCase;
+use Artisan\Settings\Settings;
 
 class SettingsTest extends TestCase
 {
@@ -85,13 +85,18 @@ class SettingsTest extends TestCase
         $model = Mockery::mock(Model::class);
         $model->shouldReceive('properties->get')->once()->andReturn(
             Collection::make([
-                new Fluent(['key' => 'date',  'value' => '2019-01-01']),
+                new Fluent(['key' => 'date', 'value' => '2019-01-01']),
             ])
         );
 
         $settings = (new UserSettings($model));
 
         $this->assertEquals('January 01, 2019', $settings->get('date'));
+    }
+
+    function test_persist_the_settings()
+    {
+        $this->markTestIncomplete("Not sure how to test this one yet");
     }
 }
 
