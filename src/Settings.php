@@ -2,7 +2,6 @@
 
 namespace Artisan\Settings;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -29,28 +28,17 @@ class Settings
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $settings;
-
-    /**
-     * The model to apply the settings to.
-     *
-     * @var \Illuminate\Database\Eloquent\Model
-     */
-    protected $model;
+    protected $settings = [];
 
     /**
      * Create a settings instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  array  $settings
      * @return \Artisan\Settings\Settings
      */
-    public function __construct(Model $model  = null)
+    public function __construct($settings = [])
     {
-        if ($model) {
-            $this->model = $model;
-        }
-
-        $this->settings = $this->parseSettings();
+        $this->settings = $this->parseSettings($settings);
     }
 
     /**
@@ -114,33 +102,18 @@ class Settings
     }
 
     /**
-     * Query the model properties if one is set.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    private function getModelProperties()
-    {
-        if (! $this->model) {
-            return Collection::make();
-        }
-
-        return $this->model->properties()->get()->mapWithKeys(function ($property) {
-            return [$property->key => $property->value];
-        });
-    }
-
-    /**
      * Build the settings file from the database and merge the defaults. This
      * also applies the cast with the default values.
      *
+     * @param  array  $settings
      * @return \Illuminate\Support\Collection
      */
-    private function parseSettings()
+    private function parseSettings($settings = [])
     {
         return Collection::make(
             Arr::dot($this->defaults)
         )->merge(
-            $this->getModelProperties()
+            $settings
         )->mapWithKeys(function ($value, $key) {
             if (! $this->hasCast($key)) {
                 return [$key => $value];
