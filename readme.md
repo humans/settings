@@ -13,7 +13,7 @@ User::first()->settings->get('random', 'default-value'); // default-value
 ```
 
 ## Installation
-Pull in the package.
+Install the package via composer.
 
 ```sh
 composer require artisan/laravel-settings
@@ -29,12 +29,12 @@ Migrate the settings table.
 
 ```sh
 php artisan migrate
-``
+```
 
 ## Usage
 Create a settings file for your model.
 
-```
+```sh
 php artisan make:settings UserSettings
 ```
 
@@ -54,7 +54,7 @@ class Workspace extends Model
 }
 ```
 
-Don't forget to map your settings file in `laravel-settings.php`!!!
+Map the settings file to the model file in `larave-settings.php`
 
 ```php
 return [
