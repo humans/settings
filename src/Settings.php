@@ -4,7 +4,6 @@ namespace Artisan\Settings;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 
@@ -43,14 +42,14 @@ class Settings
      * @param  mixed  $value
      * @return void
      */
-    public function set($attribute, $value)
-    {
-        $this->query()->updateOrCreate([
-            'key' => $attribute,
-        ], [
-            'value' => $value,
-        ]);
-    }
+    // public function set($attribute, $value)
+    // {
+    //     $this->query()->updateOrCreate([
+    //         'key' => $attribute,
+    //     ], [
+    //         'value' => $value,
+    //     ]);
+    // }
 
     /**
      * Start a new query from the settings table.
@@ -70,37 +69,31 @@ class Settings
      * @param  mixed  $default
      * @return mixed
      */
-    public function get($attribute, $default = null)
-    {
-        if ($this->query()->where('key', $attribute)->exists()) {
-            return $this->query()->where('key', $attribute)->value('value');
-        }
+    // public function get($attribute, $default = null)
+    // {
+    //     if ($this->query()->where('key', $attribute)->exists()) {
+    //         return $this->query()->where('key', $attribute)->value('value');
+    //     }
 
-        return $default ?? Arr::get($this->defaults, $attribute);
-    }
+    //     return $default ?? Arr::get($this->defaults, $attribute);
+    // }
 
     /**
      * Get all of the settings with the default fallbacks.
      *
-     * @return array
+     * @return \Artisan\Settings\SettingsCollection
      */
     public function all()
     {
-        $settings = [];
-
-        Collection::make($this->defaults)->map(function ($value, $key) {
+        return SettingsCollection::make($this->defaults)->map(function ($value, $key) {
             return new Fluent(compact('key', 'value'));
         })->merge(
-            $this->model->properties->map(function ($property) {
+            $this->query()->get()->map(function ($property) {
                 $property->value = $this->cast($property);
 
                 return $property;
             })
-        )->each(function ($property) use (&$settings) {
-            Arr::set($settings, $property->key, $property->value);
-        });
-
-        return $settings;
+        )->unflatten();
     }
 
     /**
