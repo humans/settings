@@ -2,7 +2,9 @@
 
 namespace Artisan\Settings;
 
-class Proxy
+use Illuminate\Contracts\Support\Arrayable;
+
+class Proxy implements Arrayable
 {
     /**
      * Create a new proxy from the settings array.
@@ -43,6 +45,16 @@ class Proxy
         }
 
         return array_keys($value) !== range(0, count($value) - 1);
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->array;
     }
 
     /**

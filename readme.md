@@ -5,11 +5,17 @@ This package helps to apply settings to models within a Laravel application. Thi
 ```php
 class UserSettings extends Artisan\Settings\Settings
 {
-    protected $defaults = ['test' => 'hello'];
+    protected $defaults = [
+        'notifications' => [
+            'sms' => true,
+            'email' => true,
+        ],
+    ];
 }
 
-User::first()->settings->get('test'); // hello
-User::first()->settings->get('random', 'default-value'); // default-value
+User::first()->settings->get('notifications.sms'); // true
+User::first()->settings->get('notifications.push', false); // false
+User::first()->settings->notifications->email // true
 ```
 
 ## Installation
