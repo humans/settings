@@ -79,6 +79,20 @@ class SettingsTest extends TestCase
 
         $this->assertTrue($settings->get('notifications.sms'));
     }
+
+    function test_use_custom_cast_methods()
+    {
+        $model = Mockery::mock(Model::class);
+        $model->shouldReceive('properties->get')->once()->andReturn(
+            Collection::make([
+                new Fluent(['key' => 'date',  'value' => '2019-01-01']),
+            ])
+        );
+
+        $settings = (new UserSettings($model));
+
+        $this->assertEquals('January 01, 2019', $settings->get('date'));
+    }
 }
 
 class UserSettings extends Settings
@@ -94,5 +108,11 @@ class UserSettings extends Settings
         'notifications' => [
             'sms' => 'boolean',
         ],
+        'date' => 'date:F d, Y',
     ];
+
+    protected function asDate($date, $format)
+    {
+        return date($format, strtotime($date));
+    }
 }

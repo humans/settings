@@ -24,19 +24,32 @@ class Settings
      */
     protected $casts = [];
 
-    protected $settings = [];
+    /**
+     * The colelctive settings for the model.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $settings;
 
+    /**
+     * Create a settings instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Artisan\Settings\Settings
+     */
     public function __construct(Model $model)
     {
         $this->settings = $this->settings($model);
     }
 
     /**
-     * Get all of the settings with the default fallbacks.
+     * Build the settings file from the database and merge the defaults. This
+     * also applies the cast with the default values.
      *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\Collection
      */
-    private function settings($model)
+    private function settings(Model $model)
     {
         return Collection::make(
             Arr::dot($this->defaults)
@@ -49,7 +62,7 @@ class Settings
                 return [$key => $value];
             }
 
-            return [$key => $this->cast($key, $value)];
+            return [$key => $this->castProperty($key, $value)];
         })->pipe(function ($properties) {
             $settings = [];
 
@@ -61,11 +74,23 @@ class Settings
         });
     }
 
+    /**
+     * Get the settings by key with a default fallback.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
     public function get($key, $default = null)
     {
         return Arr::get($this->settings, $key, $default);
     }
 
+    /**
+     * Get the settings array.
+     *
+     * @return array
+     */
     public function toArray()
     {
         return $this->settings->toArray();

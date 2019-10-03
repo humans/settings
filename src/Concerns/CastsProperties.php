@@ -7,30 +7,73 @@ use Illuminate\Support\Str;
 
 trait CastsProperties
 {
-    private function hasCast($key)
+    /**
+     * Check if the key is castable.
+     *
+     * @param  string  $key
+     * @return boolean
+     */
+    protected function hasCast($key)
     {
         return Arr::has($this->casts, $key);
     }
 
-    private function cast($key, $value)
+    /**
+     * Cast the value with some magic.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return mixed
+     */
+    protected function castProperty($key, $value)
     {
-        $type = Arr::get($this->casts, $key);
-        $method = $this->getCastMethod($type);
+        [$method, $argument] = $this->parseCastMethod(
+            Arr::get($this->casts, $key)
+        );
 
         if (! method_exists($this, $method)) {
-            throw new \Exception("Cast for {$type} not found.");
+            throw new \Exception("Cast method [{$method}] is undefined.");
         }
 
-        return call_user_func([$this, $method], $value);
+        return call_user_func([$this, $method], $value, $argument);
     }
 
-    private function getCastMethod($type)
+    /**
+     * Get the method name and the cast parameter.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseCastMethod($name)
     {
-        return Str::camel('cast_' . $type);
+        $segments = explode(':', $name);
+
+        if (count($segments) === 1) {
+            return [$this->getCastMethodName($name), null];
+        }
+
+        [$type, $argument] = $segments;
+        return [$this->getCastMethodName($type), $argument];
     }
 
-    private function castBoolean($value)
+    /**
+     * Get the cast method name.
+     *
+     * @param  string  $type
+     * @return string
+     */
+    protected function getCastMethodName($type)
     {
-        return $value === '1';
+        return Str::camel('as_' . $type);
+    }
+
+    /**
+     * Cast the value as a boolean.
+     *
+     * @return bool
+     */
+    protected function asBoolean($value)
+    {
+        return (bool) $value;
     }
 }
