@@ -3,57 +3,51 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
-use Mockery;
 use Artisan\Settings\Settings;
 
 class SettingsTest extends TestCase
 {
     function test_get_all_of_the_settings()
     {
-        $model = Mockery::mock(Model::class);
-        $model->shouldReceive('properties->get')->once()->andReturn(
-            Collection::make([
-                new Fluent(['key' => 'appearance.theme',  'value' => 'light']),
-                new Fluent(['key' => 'appearance.accent', 'value' => 'green']),
-            ])
-        );
-
-        $settings = (new Settings($model))->all();
+        $settings = new DefaultSettings([
+            'appearance' => [
+                'theme' => 'light',
+                'accent' => 'green',
+            ],
+        ]);
 
         $this->assertEquals([
             'appearance' => [
                 'theme' => 'light',
                 'accent' => 'green',
+                'font_size' => '16px',
             ],
-        ], $settings);
+        ], $settings->all());
     }
 
     function test_get_settings_with_fallback()
     {
-        $settings = (new BasicSettings)->all();
+        $settings = new DefaultSettings;
 
         $this->assertEquals([
             'appearance' => [
                 'theme' => 'dark',
                 'accent' => 'blue',
+                'font_size' => '16px',
             ],
-        ], $settings);
+        ], $settings->all());
     }
 
     function test_get_a_single_setting()
     {
-        $model = Mockery::mock(Model::class);
-        $model->shouldReceive('properties->get')->once()->andReturn(
-            Collection::make([
-                new Fluent(['key' => 'appearance.theme',  'value' => 'light']),
-                new Fluent(['key' => 'appearance.accent', 'value' => 'green']),
-            ])
-        );
-
-        $settings = new Settings($model);
+        $settings = new Settings([
+            'appearance' => [
+                'theme' => 'light',
+                'accent' => 'green',
+            ],
+        ]);
 
         $this->assertEquals(
             'light',
@@ -61,9 +55,14 @@ class SettingsTest extends TestCase
         );
     }
 
-    function test_persist_the_settings()
+    function test_get_a_single_setting_with_a_fallback()
     {
-        $this->markTestIncomplete("Not sure how to test this one yet");
+        $settings = new Settings;
+
+        $this->assertEquals(
+            'fallback',
+            $settings->get('huh', 'fallback')
+        );
     }
 
     function test_get_settings_magically()
@@ -90,12 +89,13 @@ class MagicSettings extends Settings
     ];
 }
 
-class BasicSettings extends Settings
+class DefaultSettings extends Settings
 {
     protected $defaults = [
         'appearance' => [
             'theme' => 'dark',
             'accent' => 'blue',
+            'font_size' => '16px',
         ],
     ];
 }

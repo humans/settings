@@ -54,33 +54,6 @@ class Settings
     }
 
     /**
-     * Persist the change of multiple attributes in the database.
-     *
-     * @param  array  $attributes
-     * @return void
-     */
-    public function update($attribute = [])
-    {
-        Collection::make(
-            Arr::dot($attribute)
-        )->each(function ($value, $key) {
-            $this->set($key, $value);
-        });
-    }
-
-    /**
-     * Persist a change for a single attribute.
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return void
-     */
-    public function set($key, $value)
-    {
-        $this->model->properties()->updateOrCreate(['key' => $key], ['value' => $value]);
-    }
-
-    /**
      * Get the settings array.
      *
      * @return array
@@ -113,7 +86,7 @@ class Settings
         return Collection::make(
             Arr::dot($this->defaults)
         )->merge(
-            $settings
+            Arr::dot($settings)
         )->mapWithKeys(function ($value, $key) {
             if (! $this->hasCast($key)) {
                 return [$key => $value];

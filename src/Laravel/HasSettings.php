@@ -36,7 +36,11 @@ trait HasSettings
     {
         $class = $this->getSettingsClass();
 
-        return new $class($this);
+        return new $class(
+            $this->properties()->get()->mapWithKeys(function ($property) {
+                return [$property->key => $property->value];
+            })
+        );
     }
 
     /**
