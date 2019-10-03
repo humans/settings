@@ -55,11 +55,11 @@ class Settings
     /**
      * Start a new query from the settings table.
      *
-     * @return \Illuminate\Database\Eliquent\Builder
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     private function query()
     {
-        return $this->model->properties()->query();
+        return $this->model->properties();
     }
 
     /**
@@ -76,7 +76,7 @@ class Settings
             return $this->query()->where('key', $attribute)->value('value');
         }
 
-        return  $default ?? Arr::get($this->defaults, $attribute);
+        return $default ?? Arr::get($this->defaults, $attribute);
     }
 
     /**

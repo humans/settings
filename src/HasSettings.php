@@ -4,7 +4,6 @@ namespace Artisan\Settings;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\App;
 
 trait HasSettings
 {
