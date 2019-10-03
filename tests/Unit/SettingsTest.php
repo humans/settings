@@ -21,7 +21,7 @@ class SettingsTest extends TestCase
             ])
         );
 
-        $settings = (new Settings($model))->all()->toArray();
+        $settings = (new Settings($model))->toArray();
 
         $this->assertEquals([
             'appearance' => [
@@ -38,7 +38,7 @@ class SettingsTest extends TestCase
             Collection::make()
         );
 
-        $settings = (new UserSettings($model))->all()->toArray();
+        $settings = (new UserSettings($model))->toArray();
 
         $this->assertEquals([
             'appearance' => [
@@ -46,6 +46,38 @@ class SettingsTest extends TestCase
                 'accent' => 'blue',
             ],
         ], $settings);
+    }
+
+    function test_get_a_single_setting()
+    {
+        $model = Mockery::mock(Model::class);
+        $model->shouldReceive('properties->get')->once()->andReturn(
+            Collection::make([
+                new Fluent(['key' => 'appearance.theme',  'value' => 'light']),
+                new Fluent(['key' => 'appearance.accent', 'value' => 'green']),
+            ])
+        );
+
+        $settings = new Settings($model);
+
+        $this->assertEquals(
+            'light',
+            $settings->get('appearance.theme')
+        );
+    }
+
+    function test_cast_values()
+    {
+        $model = Mockery::mock(Model::class);
+        $model->shouldReceive('properties->get')->once()->andReturn(
+            Collection::make([
+                new Fluent(['key' => 'notifications.sms',  'value' => '1']),
+            ])
+        );
+
+        $settings = (new UserSettings($model));
+
+        $this->assertTrue($settings->get('notifications.sms'));
     }
 }
 
@@ -55,6 +87,12 @@ class UserSettings extends Settings
         'appearance' => [
             'theme' => 'dark',
             'accent' => 'blue',
+        ],
+    ];
+
+    protected $casts = [
+        'notifications' => [
+            'sms' => 'boolean',
         ],
     ];
 }
