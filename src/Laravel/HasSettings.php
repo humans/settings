@@ -1,8 +1,7 @@
 <?php
 
-namespace Artisan\Settings;
+namespace Artisan\Settings\Laravel;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use ReflectionClass;
 
