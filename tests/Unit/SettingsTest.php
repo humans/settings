@@ -21,7 +21,7 @@ class SettingsTest extends TestCase
             ])
         );
 
-        $settings = (new Settings($model))->toArray();
+        $settings = (new Settings($model))->all();
 
         $this->assertEquals([
             'appearance' => [
@@ -38,7 +38,7 @@ class SettingsTest extends TestCase
             Collection::make()
         );
 
-        $settings = (new UserSettings($model))->toArray();
+        $settings = (new UserSettings($model))->all();
 
         $this->assertEquals([
             'appearance' => [

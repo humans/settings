@@ -95,7 +95,7 @@ class Settings
      *
      * @return array
      */
-    public function toArray()
+    public function all()
     {
         return $this->settings->toArray();
     }
