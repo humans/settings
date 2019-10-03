@@ -95,9 +95,20 @@ class Settings
      *
      * @return array
      */
-    public function toArray()
+    public function all()
     {
         return $this->settings->toArray();
+    }
+
+    /**
+     * Magically get the settings through nested public attributes.
+     *
+     * @param  string  $key
+     * @return mixed|\Artisan\Settings\Proxy
+     */
+    public function __get($key)
+    {
+        return Proxy::settings($this->get($key));
     }
 
     /**

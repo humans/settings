@@ -5,11 +5,17 @@ This package helps to apply settings to models within a Laravel application. Thi
 ```php
 class UserSettings extends Artisan\Settings\Settings
 {
-    protected $defaults = ['test' => 'hello'];
+    protected $defaults = [
+        'notifications' => [
+            'sms' => true,
+            'email' => true,
+        ],
+    ];
 }
 
-User::first()->settings->get('test'); // hello
-User::first()->settings->get('random', 'default-value'); // default-value
+User::first()->settings->get('notifications.sms'); // true
+User::first()->settings->get('notifications.push', false); // false
+User::first()->settings->notifications->email // true
 ```
 
 ## Installation
@@ -54,15 +60,30 @@ class Workspace extends Model
 }
 ```
 
-Map the settings file to the model file in `larave-settings.php`
+By default, this will guess the class name + settings in the settings namespace. To customize this, override the `getSettingsClass` in the model
 
 ```php
-return [
-    'classes' => [
-        App\User::class => App\Settings\UserSettings::class,
-    ],
-];
+class User extends Model
+{
+    use HasSettings;
+
+    public function getSettingsClass()
+    {
+        return \App\Models\Settings\AccountSettings::class;
+    }
+}
+
+class Workspace extends Model
+{
+    use HasSettings;
+
+    public function getSettingsClass()
+    {
+        return \App\Models\Settings\AccountSettings::class;
+    }
+}
 ```
+
 
 ## `get($key, $default = null)`
 When pulling in settings from the database, take note that if the setting doesn't exist, the function will return null.
@@ -118,8 +139,10 @@ namespace App\Settings;
 class UserSettings
 {
     protected $defaults = [
-        'notification.sms' => false,
-        'notification.email' => true,
+        'notification' => [
+            'sms' => true,
+            'email' => true,
+        ],
     ];
 
     protected $casts = [
@@ -152,7 +175,7 @@ class UserSettings
         ]
     ];
 
-    protected function castSomeCustomCast($value)
+    protected function asSomeCustomCast($value)
     {
         return 'transformed value here';
     }
