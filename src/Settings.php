@@ -3,6 +3,7 @@
 namespace Artisan\Settings;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 
@@ -41,7 +42,7 @@ class Settings
     {
         $settings = [];
 
-        collect($this->defaults)->map(function ($value, $key) {
+        Collection::make($this->defaults)->map(function ($value, $key) {
             return new Fluent(compact('key', 'value'));
         })->merge(
             $this->model->properties->map(function ($property) {
