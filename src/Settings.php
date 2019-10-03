@@ -2,6 +2,7 @@
 
 namespace Artisan\Settings;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
@@ -30,29 +31,59 @@ class Settings
      */
     protected $model;
 
-    public function __construct($model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }
 
+    /**
+     * Persist the settings to the database.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return void
+     */
     public function set($attribute, $value)
     {
-        $this->model->properties()->updateOrCreate([
+        $this->query()->updateOrCreate([
             'key' => $attribute,
         ], [
             'value' => $value,
         ]);
     }
 
-    public function get($attribute, $default = null)
+    /**
+     * Start a new query from the settings table.
+     *
+     * @return \Illuminate\Database\Eliquent\Builder
+     */
+    private function query()
     {
-        return $this
-            ->model
-            ->properties()
-            ->where('key', $attribute)
-            ->value('value') ?? $default ?? Arr::get($this->defaults, $attribute);
+        return $this->model->properties()->query();
     }
 
+    /**
+     * Get the model settings and fall back to either a user defined parameters
+     * of the user settings file.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function get($attribute, $default = null)
+    {
+        if ($this->query()->where('key', $attribute)->exists()) {
+            return $this->query()->where('key', $attribute)->value('value');
+        }
+
+        return  $default ?? Arr::get($this->defaults, $attribute);
+    }
+
+    /**
+     * Get all of the settings with the default fallbacks.
+     *
+     * @return array
+     */
     public function all()
     {
         $settings = [];
@@ -72,6 +103,12 @@ class Settings
         return $settings;
     }
 
+    /**
+     * Cast the value if it exists.
+     *
+     * @param  string  $property
+     * @return mixed
+     */
     protected function cast($property)
     {
         if (! $cast = Arr::get($this->casts, $property->key)) {
@@ -87,6 +124,11 @@ class Settings
         return $this->{$method}($property->value);
     }
 
+    /**
+     * Cast the value into a boolean.
+     *
+     * @return boolean
+     */
     protected function castBoolean($value)
     {
         return $value !== '0';
