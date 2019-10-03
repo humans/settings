@@ -101,6 +101,17 @@ class Settings
     }
 
     /**
+     * Magically get the settings through nested public attributes.
+     *
+     * @param  string  $key
+     * @return mixed|\Artisan\Settings\Proxy
+     */
+    public function __get($key)
+    {
+        return Proxy::settings($this->get($key));
+    }
+
+    /**
      * Build the settings file from the database and merge the defaults. This
      * also applies the cast with the default values.
      *

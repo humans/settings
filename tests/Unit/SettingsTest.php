@@ -38,7 +38,7 @@ class SettingsTest extends TestCase
             Collection::make()
         );
 
-        $settings = (new UserSettings($model))->all();
+        $settings = (new BasicSettings($model))->all();
 
         $this->assertEquals([
             'appearance' => [
@@ -75,7 +75,7 @@ class SettingsTest extends TestCase
             ])
         );
 
-        $settings = (new UserSettings($model));
+        $settings = (new CastSettings($model));
 
         $this->assertTrue($settings->get('notifications.sms'));
     }
@@ -89,7 +89,7 @@ class SettingsTest extends TestCase
             ])
         );
 
-        $settings = (new UserSettings($model));
+        $settings = (new CastSettings($model));
 
         $this->assertEquals('January 01, 2019', $settings->get('date'));
     }
@@ -98,17 +98,38 @@ class SettingsTest extends TestCase
     {
         $this->markTestIncomplete("Not sure how to test this one yet");
     }
+
+    function test_get_settings_magically()
+    {
+        $model = Mockery::mock(Model::class);
+        $model->shouldReceive('properties->get')->once()->andReturn(
+            Collection::make([])
+        );
+
+        $settings = (new MagicSettings($model));
+
+        $this->assertEquals('active', $settings->status);
+
+        $this->assertEquals(['a', 'b', 'c', 'd'], $settings->letters);
+
+        $this->assertEquals('dark', $settings->appearance->theme);
+    }
 }
 
-class UserSettings extends Settings
+class MagicSettings extends Settings
 {
     protected $defaults = [
         'appearance' => [
             'theme' => 'dark',
             'accent' => 'blue',
         ],
+        'letters' => ['a', 'b', 'c', 'd'],
+        'status' => 'active',
     ];
+}
 
+class CastSettings extends Settings
+{
     protected $casts = [
         'notifications' => [
             'sms' => 'boolean',
@@ -120,4 +141,14 @@ class UserSettings extends Settings
     {
         return date($format, strtotime($date));
     }
+}
+
+class BasicSettings extends Settings
+{
+    protected $defaults = [
+        'appearance' => [
+            'theme' => 'dark',
+            'accent' => 'blue',
+        ],
+    ];
 }
