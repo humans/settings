@@ -33,12 +33,7 @@ class SettingsTest extends TestCase
 
     function test_get_settings_with_fallback()
     {
-        $model = Mockery::mock(Model::class);
-        $model->shouldReceive('properties->get')->once()->andReturn(
-            Collection::make()
-        );
-
-        $settings = (new BasicSettings($model))->all();
+        $settings = (new BasicSettings)->all();
 
         $this->assertEquals([
             'appearance' => [
@@ -66,34 +61,6 @@ class SettingsTest extends TestCase
         );
     }
 
-    function test_cast_values()
-    {
-        $model = Mockery::mock(Model::class);
-        $model->shouldReceive('properties->get')->once()->andReturn(
-            Collection::make([
-                new Fluent(['key' => 'notifications.sms',  'value' => '1']),
-            ])
-        );
-
-        $settings = (new CastSettings($model));
-
-        $this->assertTrue($settings->get('notifications.sms'));
-    }
-
-    function test_use_custom_cast_methods()
-    {
-        $model = Mockery::mock(Model::class);
-        $model->shouldReceive('properties->get')->once()->andReturn(
-            Collection::make([
-                new Fluent(['key' => 'date', 'value' => '2019-01-01']),
-            ])
-        );
-
-        $settings = (new CastSettings($model));
-
-        $this->assertEquals('January 01, 2019', $settings->get('date'));
-    }
-
     function test_persist_the_settings()
     {
         $this->markTestIncomplete("Not sure how to test this one yet");
@@ -101,12 +68,7 @@ class SettingsTest extends TestCase
 
     function test_get_settings_magically()
     {
-        $model = Mockery::mock(Model::class);
-        $model->shouldReceive('properties->get')->once()->andReturn(
-            Collection::make([])
-        );
-
-        $settings = (new MagicSettings($model));
+        $settings = new MagicSettings;
 
         $this->assertEquals('active', $settings->status);
 
@@ -126,21 +88,6 @@ class MagicSettings extends Settings
         'letters' => ['a', 'b', 'c', 'd'],
         'status' => 'active',
     ];
-}
-
-class CastSettings extends Settings
-{
-    protected $casts = [
-        'notifications' => [
-            'sms' => 'boolean',
-        ],
-        'date' => 'date:F d, Y',
-    ];
-
-    protected function asDate($date, $format)
-    {
-        return date($format, strtotime($date));
-    }
 }
 
 class BasicSettings extends Settings

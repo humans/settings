@@ -44,9 +44,11 @@ class Settings
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Artisan\Settings\Settings
      */
-    public function __construct(Model $model)
+    public function __construct(Model $model  = null)
     {
-        $this->model = $model;
+        if ($model) {
+            $this->model = $model;
+        }
 
         $this->settings = $this->parseSettings();
     }
@@ -112,6 +114,22 @@ class Settings
     }
 
     /**
+     * Query the model properties if one is set.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function getModelProperties()
+    {
+        if (! $this->model) {
+            return Collection::make();
+        }
+
+        return $this->model->properties()->get()->mapWithKeys(function ($property) {
+            return [$property->key => $property->value];
+        });
+    }
+
+    /**
      * Build the settings file from the database and merge the defaults. This
      * also applies the cast with the default values.
      *
@@ -122,9 +140,7 @@ class Settings
         return Collection::make(
             Arr::dot($this->defaults)
         )->merge(
-            $this->model->properties()->get()->mapWithKeys(function ($property) {
-                return [$property->key => $property->value];
-            })
+            $this->getModelProperties()
         )->mapWithKeys(function ($value, $key) {
             if (! $this->hasCast($key)) {
                 return [$key => $value];

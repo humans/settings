@@ -76,4 +76,9 @@ trait CastsProperties
     {
         return (bool) $value;
     }
+
+    protected function asJson($json)
+    {
+        return json_decode($json);
+    }
 }
