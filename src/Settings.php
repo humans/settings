@@ -9,13 +9,28 @@ use Illuminate\Support\Str;
 
 class Settings
 {
+    /**
+     * The default settings if there are no settings found in the database.
+     *
+     * @var array
+     */
     protected $defaults = [];
 
+    /**
+     * The attribtes that will be casted.
+     *
+     * @var array
+     */
     protected $casts = [];
 
+    /**
+     * The model to get the properties from.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
     protected $model;
 
-    public function setModel($model)
+    public function __construct($model)
     {
         $this->model = $model;
     }
