@@ -36,7 +36,9 @@ trait HasSettings
      */
     public function settings()
     {
-        return $this->getSettingsClass()::make(
+        $class = $this->getSettingsClass();
+
+        return new $class(
             $this->properties()->get()->mapWithKeys(function ($property) {
                 return [$property->key => $property->value];
             })
@@ -45,8 +47,10 @@ trait HasSettings
 
     public function updateSettings($settings)
     {
+        $instance = call_user_func([$this->getSettingsClass(), 'withoutDefaults'], $settings);
+
         Collection::make(
-            Arr::dot($this->getSettingsClass()::withoutDefaults($settings)->toDatabase())
+            Arr::dot($instance->toDatabase())
         )->each(function ($value, $key) {
             $this->properties()->updateOrCreate(['key' => $key], ['value' => $value]);
         });

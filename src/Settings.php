@@ -32,17 +32,6 @@ class Settings
     protected $settings = [];
 
     /**
-     * Create a new settings instance.
-     *
-     * @param  array  $settings
-     * @return \Artisan\Settings\Settings
-     */
-    public static function make($settings = [])
-    {
-        return new static($settings);
-    }
-
-    /**
      * Create a new settings instance without the defaults.
      *
      * @param  array  $settings
