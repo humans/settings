@@ -1,6 +1,6 @@
 <?php
 
-namespace Artisan\Settings\Commands;
+namespace Artisan\Settings\Laravel\Commands;
 
 use Illuminate\Console\DetectsApplicationNamespace;
 use Illuminate\Console\Command;

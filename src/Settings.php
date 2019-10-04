@@ -2,13 +2,13 @@
 
 namespace Artisan\Settings;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class Settings
 {
-    use Concerns\CastsProperties;
+    use Concerns\CastsProperties,
+        Concerns\ToDatabase;
 
     /**
      * The default settings if there are no settings found in the database.
@@ -29,26 +29,55 @@ class Settings
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $settings;
+    protected $settings = [];
 
     /**
-     * The model to apply the settings to.
+     * Create a new settings instance without the defaults.
      *
-     * @var \Illuminate\Database\Eloquent\Model
-     */
-    protected $model;
-
-    /**
-     * Create a settings instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  array  $settings
      * @return \Artisan\Settings\Settings
      */
-    public function __construct(Model $model)
+    public static function withoutDefaults($settings = [])
     {
-        $this->model = $model;
+        return (new static)->setDefaults([])->setSettings($settings);
+    }
 
-        $this->settings = $this->parseSettings();
+    /**
+     * Create a settings instance while checking for defaults.
+     *
+     * @param  array  $settings
+     * @param  boolean  $hasDefaults
+     * @return \Artisan\Settings\Settings
+     */
+    public function __construct($settings = [])
+    {
+        $this->settings = $this->parse($settings);
+    }
+
+    /**
+     * Set new settings to parse.
+     *
+     * @param  array  $settings
+     * @return \Artisan\Settings\Settings
+     */
+    public function setSettings($settings)
+    {
+        $this->settings = $this->parse($settings);
+
+        return $this;
+    }
+
+    /**
+     * Set the defaults.
+     *
+     * @param  array  $defaults
+     * @return \Artisan\Settings\Settings
+     */
+    public function setDefaults($defaults = [])
+    {
+        $this->defaults = $defaults;
+
+        return $this;
     }
 
     /**
@@ -61,33 +90,6 @@ class Settings
     public function get($key, $default = null)
     {
         return Arr::get($this->settings, $key, $default);
-    }
-
-    /**
-     * Persist the change of multiple attributes in the database.
-     *
-     * @param  array  $attributes
-     * @return void
-     */
-    public function update($attribute = [])
-    {
-        Collection::make(
-            Arr::dot($attribute)
-        )->each(function ($value, $key) {
-            $this->set($key, $value);
-        });
-    }
-
-    /**
-     * Persist a change for a single attribute.
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return void
-     */
-    public function set($key, $value)
-    {
-        $this->model->properties()->updateOrCreate(['key' => $key], ['value' => $value]);
     }
 
     /**
@@ -115,16 +117,15 @@ class Settings
      * Build the settings file from the database and merge the defaults. This
      * also applies the cast with the default values.
      *
+     * @param  array  $settings
      * @return \Illuminate\Support\Collection
      */
-    private function parseSettings()
+    public function parse($settings = [])
     {
         return Collection::make(
             Arr::dot($this->defaults)
         )->merge(
-            $this->model->properties()->get()->mapWithKeys(function ($property) {
-                return [$property->key => $property->value];
-            })
+            Arr::dot($settings)
         )->mapWithKeys(function ($value, $key) {
             if (! $this->hasCast($key)) {
                 return [$key => $value];
