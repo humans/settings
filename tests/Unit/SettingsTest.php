@@ -3,8 +3,6 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Fluent;
 use Artisan\Settings\Settings;
 
 class SettingsTest extends TestCase

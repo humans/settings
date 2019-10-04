@@ -2,15 +2,13 @@
 
 namespace DummyNamespace;
 
-use Artisan\Settings\Settings;
-
-class DummySettingsClass extends Settings
+class DummySettingsClass extends \Artisan\Settings\Settings
 {
     protected $defaults = [
-        // ...
+        //
     ];
 
     protected $casts = [
-        // ...
+        //
     ];
 }

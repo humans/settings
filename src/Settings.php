@@ -7,7 +7,8 @@ use Illuminate\Support\Collection;
 
 class Settings
 {
-    use Concerns\CastsProperties;
+    use Concerns\CastsProperties,
+        Concerns\PreparesProperties;
 
     /**
      * The default settings if there are no settings found in the database.
