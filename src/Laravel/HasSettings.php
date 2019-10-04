@@ -2,6 +2,8 @@
 
 namespace Artisan\Settings\Laravel;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use ReflectionClass;
 
@@ -34,19 +36,26 @@ trait HasSettings
      */
     public function settings()
     {
-        $class = $this->getSettingsClass();
-
-        return new $class(
+        return $this->getSettingsClass()::make(
             $this->properties()->get()->mapWithKeys(function ($property) {
                 return [$property->key => $property->value];
             })
         );
     }
 
+    public function updateSettings($settings)
+    {
+        Collection::make(
+            Arr::dot($this->getSettingsClass()::withoutDefaults($settings)->toDatabase())
+        )->each(function ($value, $key) {
+            $this->properties()->updateOrCreate(['key' => $key], ['value' => $value]);
+        });
+    }
+
     /**
      * Guess the settings class name relative to the current file.
      *
-     * @return string
+     * @return stringCreate a new settings instance without the defaults.
      */
     protected function getSettingsClass()
     {

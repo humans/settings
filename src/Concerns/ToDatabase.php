@@ -5,7 +5,7 @@ namespace Artisan\Settings\Concerns;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-trait PreparesProperties
+trait ToDatabase
 {
     public function toDatabase()
     {

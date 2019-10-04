@@ -73,6 +73,17 @@ class SettingsTest extends TestCase
 
         $this->assertEquals('dark', $settings->appearance->theme);
     }
+
+    function test_ignore_defaults()
+    {
+        $settings = DefaultSettings::withoutDefaults([
+            'hello' => 'world',
+        ]);
+
+        $this->assertEquals([
+            'hello' => 'world',
+        ], $settings->all());
+    }
 }
 
 class MagicSettings extends Settings

@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 class Settings
 {
     use Concerns\CastsProperties,
-        Concerns\PreparesProperties;
+        Concerns\ToDatabase;
 
     /**
      * The default settings if there are no settings found in the database.
@@ -32,14 +32,63 @@ class Settings
     protected $settings = [];
 
     /**
-     * Create a settings instance.
+     * Create a new settings instance.
      *
      * @param  array  $settings
      * @return \Artisan\Settings\Settings
      */
+    public static function make($settings = [])
+    {
+        return new static($settings);
+    }
+
+    /**
+     * Create a new settings instance without the defaults.
+     *
+     * @param  array  $settings
+     * @return \Artisan\Settings\Settings
+     */
+    public static function withoutDefaults($settings = [])
+    {
+        return (new static)->setDefaults([])->setSettings($settings);
+    }
+
+    /**
+     * Create a settings instance while checking for defaults.
+     *
+     * @param  array  $settings
+     * @param  boolean  $hasDefaults
+     * @return \Artisan\Settings\Settings
+     */
     public function __construct($settings = [])
     {
-        $this->settings = $this->parseSettings($settings);
+        $this->settings = $this->parse($settings);
+    }
+
+    /**
+     * Set new settings to parse.
+     *
+     * @param  array  $settings
+     * @return \Artisan\Settings\Settings
+     */
+    public function setSettings($settings)
+    {
+        $this->settings = $this->parse($settings);
+
+        return $this;
+    }
+
+    /**
+     * Set the defaults.
+     *
+     * @param  array  $defaults
+     * @return \Artisan\Settings\Settings
+     */
+    public function setDefaults($defaults = [])
+    {
+        $this->defaults = $defaults;
+
+        return $this;
     }
 
     /**
@@ -82,7 +131,7 @@ class Settings
      * @param  array  $settings
      * @return \Illuminate\Support\Collection
      */
-    private function parseSettings($settings = [])
+    public function parse($settings = [])
     {
         return Collection::make(
             Arr::dot($this->defaults)
