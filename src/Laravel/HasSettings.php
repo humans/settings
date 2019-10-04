@@ -36,21 +36,23 @@ trait HasSettings
      */
     public function settings()
     {
-        $class = $this->getSettingsClass();
-
-        return new $class(
+        return $this->newSettings(
             $this->properties()->get()->mapWithKeys(function ($property) {
                 return [$property->key => $property->value];
             })
         );
     }
 
-    public function updateSettings($settings)
+    /**
+     * Update the settings withoiut forcing persistence on defaults.
+     *
+     * @param  array  $settings
+     * @return void
+     */
+    public function updateSettings($settings = [])
     {
-        $instance = call_user_func([$this->getSettingsClass(), 'withoutDefaults'], $settings);
-
         Collection::make(
-            Arr::dot($instance->toDatabase())
+            Arr::dot($this->newSettingsWithoutDefaults($settings)->toDatabase())
         )->each(function ($value, $key) {
             $this->properties()->updateOrCreate(['key' => $key], ['value' => $value]);
         });
@@ -70,5 +72,29 @@ trait HasSettings
         $class = class_basename($this) . 'Settings';
 
         return sprintf("%s\%s\%s", $namespace, $settingsNamespace, $class);
+    }
+
+    /**
+     * Create a new settings instance.
+     *
+     * @param  array  $settings
+     * @return \Artisan\Settigs\Settings
+     */
+    private function newSettings($settings = [])
+    {
+        $class = $this->getSettingsClass();
+
+        return new $class($settings);
+    }
+
+    /**
+     * Create a new settings instance without applying the defaults.
+     *
+     * @param  array  $settings
+     * @return \Artisan\Settigs\Settings
+     */
+    private function newSettingsWithoutDefaults($settings = [])
+    {
+        return call_user_func([$this->getSettingsClass(), 'withoutDefaults'], $settings);
     }
 }
