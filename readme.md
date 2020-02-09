@@ -1,10 +1,6 @@
 # Settings Property Bag
 
-[![Latest Stable Version](https://poser.pugx.org/humans/settings/v/stable)](https://packagist.org/packages/humans/settings)
-
-[![License](https://poser.pugx.org/humans/settings/license)](https://packagist.org/packages/humans/settings)
-
-
+[![Latest Stable Version](https://poser.pugx.org/humans/settings/v/stable)](https://packagist.org/packages/humans/settings) [![License](https://poser.pugx.org/humans/settings/license)](https://packagist.org/packages/humans/settings)
 
 This is a property bag for handling settings objects. This also has integration with Laravel database models out of the box. 
 
