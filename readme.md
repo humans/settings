@@ -217,7 +217,7 @@ class User extends Model
 {
     use HasSettings;
 
-    public function getSettingsClass()
+    protected function getSettingsClass()
     {
         return \App\Models\Settings\AccountSettings::class;
     }

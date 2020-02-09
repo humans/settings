@@ -53,6 +53,8 @@ trait HasSettings
      */
     public function updateSettings($settings = [])
     {
+        trigger_error('Deprecated: Use $model->settings->update() instead.');
+
         Collection::make(
             Arr::dot($this->newSettingsWithoutDefaults($settings)->toDatabase())
         )->each(function ($value, $key) {
