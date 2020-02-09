@@ -1,6 +1,6 @@
 <?php
 
-namespace Artisan\Settings;
+namespace Humans\Settings;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -35,7 +35,7 @@ class Settings
      * Create a new settings instance without the defaults.
      *
      * @param  array  $settings
-     * @return \Artisan\Settings\Settings
+     * @return \Humans\Settings\Settings
      */
     public static function withoutDefaults($settings = [])
     {
@@ -47,7 +47,7 @@ class Settings
      *
      * @param  array  $settings
      * @param  boolean  $hasDefaults
-     * @return \Artisan\Settings\Settings
+     * @return \Humans\Settings\Settings
      */
     public function __construct($settings = [])
     {
@@ -58,7 +58,7 @@ class Settings
      * Set new settings to parse.
      *
      * @param  array  $settings
-     * @return \Artisan\Settings\Settings
+     * @return \Humans\Settings\Settings
      */
     public function setSettings($settings)
     {
@@ -71,7 +71,7 @@ class Settings
      * Set the defaults.
      *
      * @param  array  $defaults
-     * @return \Artisan\Settings\Settings
+     * @return \Humans\Settings\Settings
      */
     public function setDefaults($defaults = [])
     {
@@ -106,7 +106,7 @@ class Settings
      * Magically get the settings through nested public attributes.
      *
      * @param  string  $key
-     * @return mixed|\Artisan\Settings\Proxy
+     * @return mixed|\Humans\Settings\Proxy
      */
     public function __get($key)
     {

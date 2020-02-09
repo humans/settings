@@ -1,6 +1,6 @@
 <?php
 
-namespace Artisan\Settings;
+namespace Humans\Settings;
 
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -10,7 +10,7 @@ class Proxy implements Arrayable
      * Create a new proxy from the settings array.
      *
      * @param  array  $array
-     * @return \Artisan\Settings\Proxy
+     * @return \Humans\Settings\Proxy
      */
     public function __construct($array)
     {
