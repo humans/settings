@@ -14,8 +14,37 @@ class Settings
         $this->settingsBag = $settingsBag;
     }
 
+    /**
+     * Save the settings value to the database.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function set($key, $value)
+    {
+    }
+
+    /**
+     * Forward unimplemented methods to the settings bag.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function __call($method, array $parameters = [])
     {
         return $this->forwardCallTo($this->settingsBag, $method, $parameters);
+    }
+
+    /**
+     * Forward public attribute calls to the settings bag.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->settingsBag->{$key};
     }
 }
