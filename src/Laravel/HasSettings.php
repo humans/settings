@@ -84,7 +84,7 @@ trait HasSettings
     {
         $class = $this->getSettingsClass();
 
-        return new $class($settings);
+        return new Settings(new $class($settings));
     }
 
     /**
