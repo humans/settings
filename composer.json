@@ -1,12 +1,12 @@
 {
-    "name": "artisan/settings",
+    "name": "humans/settings",
     "description": "Settings maangement.",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Jaggy",
-            "email": "jaggy@artisan.studio"
+            "email": "jaggy@humans.ph"
         }
     ],
     "require": {
@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Artisan\\Settings\\": "src"
+            "Humans\\Settings\\": "src"
         }
     },
     "autoload-dev": {
@@ -29,7 +29,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Artisan\\Settings\\Laravel\\SettingsServiceProvider"
+                "Humans\\Settings\\Laravel\\SettingsServiceProvider"
             ]
         }
     }

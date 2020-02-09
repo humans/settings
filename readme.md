@@ -3,7 +3,7 @@
 This package helps to apply settings to models within a Laravel application. This uses the **property bag** pattern to have a single table for your all your model settings.
 
 ```php
-class UserSettings extends Artisan\Settings\Settings
+class UserSettings extends Humans\Settings\Settings
 {
     protected $defaults = [
         'notifications' => [
@@ -22,13 +22,13 @@ User::first()->settings->notifications->email // true
 Install the package via composer.
 
 ```sh
-composer require artisan/laravel-settings
+composer require humans/laravel-settings
 ```
 
 Next up is we'll publish the config.
 
 ```sh
-php artisan vendor:publish --provider="Artisan\Settings\ServiceProvider"
+php artisan vendor:publish --provider="Humans\Settings\ServiceProvider"
 ```
 
 Migrate the settings table.
@@ -44,10 +44,10 @@ Create a settings file for your model.
 php artisan make:settings UserSettings
 ```
 
-Add the `Artisan\Settings\HasSettings` trait to the model.
+Add the `Humans\Settings\HasSettings` trait to the model.
 
 ```php
-use Artisan\Settings\HasSettings;
+use Humans\Settings\HasSettings;
 
 class User extends Model
 {
