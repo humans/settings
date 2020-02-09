@@ -4,6 +4,8 @@ namespace Humans\Settings\Laravel\Commands;
 
 use Illuminate\Console\DetectsApplicationNamespace;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 
 class MakeSettingsCommand extends Command
@@ -22,14 +24,18 @@ class MakeSettingsCommand extends Command
     public function handle()
     {
         $directory = $this->directory();
-        $file = $directory . DIRECTORY_SEPARATOR . $this->argument('name') . '.php';
+        $filename = $this->argument('name') . '.php';
 
         if (! File::exists($directory)) {
             File::makeDirectory($directory, 0755, $recursive = true);
         }
 
-        if (! File::exists($file)) {
-            File::put($file, $this->stub());
+        if (! File::exists($path = $directory . DIRECTORY_SEPARATOR . $filename)) {
+            File::put($path, $this->stub());
+
+            $this->info("{$filename} created.");
+        } else {
+            $this->error("{$filename} already exists.");
         }
     }
 
@@ -44,13 +50,13 @@ class MakeSettingsCommand extends Command
 
     protected function directory()
     {
-        $path = str_replace("\\", DIRECTORY_SEPARATOR, config('laravel-settings.namespace'));
+        $path = str_replace("\\", DIRECTORY_SEPARATOR, Config::get('humans.settings.namespace'));
 
-        return app_path($path);
+        return App::path($path);
     }
 
     protected function namespace()
     {
-        return $this->getAppNamespace() . config('laravel-settings.namespace');
+        return $this->getAppNamespace() . Config::get('humans.settings.namespace');
     }
 }
