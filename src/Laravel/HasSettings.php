@@ -46,11 +46,15 @@ trait HasSettings
     /**
      * Update the settings withoiut forcing persistence on defaults.
      *
+     * @deprecated
+     *
      * @param  array  $settings
      * @return void
      */
     public function updateSettings($settings = [])
     {
+        trigger_error('Deprecated: Use $model->settings->update() instead.');
+
         Collection::make(
             Arr::dot($this->newSettingsWithoutDefaults($settings)->toDatabase())
         )->each(function ($value, $key) {
@@ -84,7 +88,7 @@ trait HasSettings
     {
         $class = $this->getSettingsClass();
 
-        return new Settings(new $class($settings));
+        return new Settings(new $class($settings), $this);
     }
 
     /**
