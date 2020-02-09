@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use Artisan\Settings\Settings;
+use Humans\Settings\Settings;
 
 class SettingsTest extends TestCase
 {

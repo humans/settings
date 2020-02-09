@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use Artisan\Settings\Settings;
+use Humans\Settings\Settings;
 use Tests\TestCase;
 
 class CastSettingsTest extends TestCase

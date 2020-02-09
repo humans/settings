@@ -1,6 +1,6 @@
 <?php
 
-namespace Artisan\Settings\Concerns;
+namespace Humans\Settings\Concerns;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;

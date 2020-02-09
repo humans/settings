@@ -1,6 +1,6 @@
 <?php
 
-namespace Artisan\Settings\Laravel;
+namespace Humans\Settings\Laravel;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -22,7 +22,7 @@ trait HasSettings
     /*
      * Access the settings through a public variable.
      *
-     * @return \Artisan\Settings\Settings
+     * @return \Humans\Settings\Settings
      */
     public function getSettingsAttribute()
     {
@@ -32,7 +32,7 @@ trait HasSettings
     /*
      * Create a new settings class instance.
      *
-     * @return \Artisan\Settings\Settings
+     * @return \Humans\Settings\Settings
      */
     public function settings()
     {
@@ -78,7 +78,7 @@ trait HasSettings
      * Create a new settings instance.
      *
      * @param  array  $settings
-     * @return \Artisan\Settigs\Settings
+     * @return \Humans\Settigs\Settings
      */
     private function newSettings($settings = [])
     {
@@ -91,7 +91,7 @@ trait HasSettings
      * Create a new settings instance without applying the defaults.
      *
      * @param  array  $settings
-     * @return \Artisan\Settigs\Settings
+     * @return \Humans\Settigs\Settings
      */
     private function newSettingsWithoutDefaults($settings = [])
     {

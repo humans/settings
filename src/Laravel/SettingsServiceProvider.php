@@ -1,23 +1,23 @@
 <?php
 
-namespace Artisan\Settings\Laravel;
+namespace Humans\Settings\Laravel;
 
 class SettingsServiceProvider extends \Illuminate\Support\ServiceProvider
 {
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../../config/laravel-settings.php',
+            __DIR__ . '/config/laravel-settings.php',
             'laravel-settings'
         );
     }
 
     public function boot()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
 
         $this->publishes([
-            __DIR__ . '/../../config/laravel-settings.php' => config_path('laravel-settings.php'),
+            __DIR__ . '/config/laravel-settings.php' => config_path('humans/settings.php'),
         ]);
 
         if ($this->app->runningInConsole()) {
