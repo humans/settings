@@ -1,9 +1,29 @@
-# Laravel Settings
+# Settings Property Bag
 
-This package helps to apply settings to models within a Laravel application. This uses the **property bag** pattern to have a single table for your all your model settings.
+[![Latest Stable Version](https://poser.pugx.org/humans/settings/v/stable)](https://packagist.org/packages/humans/settings)
+
+[![License](https://poser.pugx.org/humans/settings/license)](https://packagist.org/packages/humans/settings)
+
+
+
+This is a property bag for handling settings objects. This also has integration with Laravel database models out of the box. 
+
+## Installation
+
+You can install the package via composer:
+
+```bash
+composer require humans/settings
+```
+
+## Standalone Usage
+
+A settings bag is a class where you can store your settings that can have fallback values if no explicit values where set. (i.e. persistence)
 
 ```php
-class UserSettings extends Humans\Settings\Settings
+use Humans\Settings\Setings;
+
+class UserSettings extends Settings
 {
     protected $defaults = [
         'notifications' => [
@@ -12,42 +32,170 @@ class UserSettings extends Humans\Settings\Settings
         ],
     ];
 }
-
-User::first()->settings->get('notifications.sms'); // true
-User::first()->settings->get('notifications.push', false); // false
-User::first()->settings->notifications->email // true
 ```
 
-## Installation
-Install the package via composer.
+There are two different ways to get a value from the settings bag.
 
-```sh
-composer require humans/laravel-settings
+`get($settings, $default = null)`
+
+```php
+(new UserSettings)->get('notifications'); 
+// => ['sms' => true, 'email' => true]
+
+(new UserSettings)->get('notifications.sms');
+// => true
+
+(new UserSettings)->get('notifications.push', false);
+// => false
 ```
 
-Next up is we'll publish the config.
+Another is chaining public properties.
 
-```sh
-php artisan vendor:publish --provider="Humans\Settings\ServiceProvider"
+```php
+(new UserSettings)->notifications;
+// => ['sms' => true, 'email' => true]
+
+(new UserSettings)->notifications->sms;
+// => true
 ```
 
-Migrate the settings table.
+To get all the values from the settings bag.
 
-```sh
+```php
+(new UserSettings)->all();
+```
+
+### Overriding the default values
+
+Now that we can set values, we want to apply the persisted data to our default settings.
+
+```php
+$userSettingsFromDatabase = [
+    'notifications' => [
+        'sms' => false,
+	  ]
+];
+
+$settings = new UserSettings($userSettingsFromDatabase);
+
+$settings->all();
+# => [
+#        'notifications' => [
+#            'sms'   => false, <-- using the values from the database,
+#            'email' => true,
+#        ],
+#    ]
+```
+
+Somtimes, it's a hassle storing array values in the database:
+
+- The database might not support it.
+- We don't want to do an overly complex database via relational key value stuff.
+
+You can instead store your nested settings values via **dot notation** and this package will destructure the value into a nested array.
+
+```php
+$userSettingsFromDatabase = [
+    'notifications.sms' => false,
+];
+
+$settings = new UserSettings($userSettingsFromDatabase);
+
+$settings->all();
+# => [
+#        'notifications' => [
+#            'sms'   => false, <-- assigned via dot notation.
+#            'email' => true,
+#        ],
+#    ]
+```
+
+## Casting
+
+There are times that the values that we pull out the database don't map to the actual data types we want them to be. For that we have a `$casts` attribute to handle the mapping for all the primitives we need.
+
+```php
+class UserSettings extends Settings
+{
+    protected $defaults = [
+        'notifications' => [
+            'sms'   => 1,
+            'email' => 1,
+        ],
+    ];
+  
+    protected $casts = [
+        'notifications.sms'   => 'boolean',
+        'notifications.email' => 'boolean',
+    ];
+}
+
+(new UserSettings)->get('notifications.sms');
+# => true
+
+(new UserSettings)->get('notifications.email');
+# => true
+```
+
+The only two properties available right now are: `boolean` and `json`.
+
+**BUT DON'T FRET!** You can either help us out by adding more cast implementations or even make your own from the settings class! (The code is the same).
+
+### Adding custom casts
+
+To add custom casts, in your custom settings class (or even a parent class for all your settings classes), create a method prefixed with `as`.
+
+```php
+class UserSettings extends Settings
+{
+    protected $defaults = [
+        'age'            => '27',
+        'hours_of_sleep' => '8',
+    ];
+  
+    protected $casts = [
+        'age' => 'integer',
+    ];
+  
+    protected function asInteger($age)
+    {
+        return (int) $age;
+    }
+}
+
+(new UserSettings)->get('age');
+# => 27
+
+(new UserSettings)->get('hours_of_sleep');
+# => '8'
+```
+
+## Laravel Integration
+
+Out of the box, we try to help the setup to a minimal for Laravel projects. After installing via composer, public the config file and migrations.
+
+```bash
+php artisan vendor:publish --provider="Humans\Settings\Laravel\ServiceProvider"
+```
+
+Run our new settings table migration.
+
+```bash
 php artisan migrate
 ```
 
-## Usage
-Create a settings file for your model.
+To create the settings file:
 
-```sh
-php artisan make:settings UserSettings
+```
+php artisan settings:make UserSettings
 ```
 
-Add the `Humans\Settings\HasSettings` trait to the model.
+And finally, add our settings trait to the model. The trait will automatically look for the settings file in the namespace of your config appended with the word `Settings.`
+
+So if we have a `User.php`, by default it will look for the `App\Settings\UserSettings` class.
 
 ```php
-use Humans\Settings\HasSettings;
+use Humans\Settings\Laravel\HasSettings;
 
 class User extends Model
 {
@@ -60,9 +208,11 @@ class Workspace extends Model
 }
 ```
 
-By default, this will guess the class name + settings in the settings namespace. To customize this, override the `getSettingsClass` in the model
+To change the class location, you can change the `getSettingsClass` method in your model.
 
 ```php
+use Humans\Settings\Laravel\HasSettings;
+
 class User extends Model
 {
     use HasSettings;
@@ -72,6 +222,8 @@ class User extends Model
         return \App\Models\Settings\AccountSettings::class;
     }
 }
+
+use Humans\Settings\Laravel\HasSettings;
 
 class Workspace extends Model
 {
@@ -84,100 +236,34 @@ class Workspace extends Model
 }
 ```
 
-
-## `get($key, $default = null)`
-When pulling in settings from the database, take note that if the setting doesn't exist, the function will return null.
-
-With this method, we can pull in our settings.
+With that, you can now access your values via the `settings` public property.
 
 ```php
-$user->settings()->get('notification.sms');
-```
-Or add a default value when it isn't found!
-
-```php
-$user->settings()->get('notification.sms', $default = true);
+User::first()->settings->notifications->sms
+# => true
 ```
 
-## `set($key, $value)`
-```php
-$user->settings->set('timezone', 'Asia/Manila');
+### Saving to the database
+
+To save a single value to the database.
+
+```
+User::first()->settings->set('notifications.sms', false);
 ```
 
-all()
-When fetching all of the results, it will merge all the defaults if a Settings class exists for your model. See below for more context.
+To save multiple values at the same time:
 
 ```php
-$user->settings->all();
-```
+User::first()->settings->update([
+    'notifications' => [
+        'sms'   => false,
+        'email' => false,
+    ],
+]);
 
-Any dot notation based settings will be returned as an array.
-
-```php
-// notification.sms => true
-// notification.email => false
-// timezone => Asia/Manila
-[
-  'notification' => [
-    'sms' => true,
-    'email' => false,
-  ],
-  'timezone' => 'Asia/Manila',
-]
-```
-
-## Defaults and Casting
-There are times that these defaults might get a little too much to keep track, and we also want to make sure that the values are in their proper data type when pulling it from the database.
-
-We can create a settings class to add the defaults, and the value transformations.
-
-```php
-<?php
-
-namespace App\Settings;
-
-class UserSettings
-{
-    protected $defaults = [
-        'notification' => [
-            'sms' => true,
-            'email' => true,
-        ],
-    ];
-
-    protected $casts = [
-        'notifications' => [
-            'sms' => 'boolean',
-        ]
-    ];
-}
-```
-
-For custom casts, just in case, you can add a new method to apply the cast.
-
-```php
-<?php
-
-namespace App\Settings;
-
-class UserSettings
-{
-    protected $defaults = [
-        'notifications' => [
-            'sms' => false,
-            'email' => true,
-        ],
-    ];
-
-    protected $casts = [
-        'notifications' => [
-            'sms' => 'some_custom_cast',
-        ]
-    ];
-
-    protected function asSomeCustomCast($value)
-    {
-        return 'transformed value here';
-    }
-}
+# or using dot notation
+User::first()->settings->update([
+    'notifications.sns'   => false,
+    'notifications.email' => false,
+]);
 ```

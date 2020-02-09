@@ -26,6 +26,17 @@ class Settings
     }
 
     /**
+     * Save multiple values at the same time.
+     *
+     * @param array  $settingss
+     * @return mixed
+     */
+    public function update($settings)
+    {
+    }
+
+
+    /**
      * Forward unimplemented methods to the settings bag.
      *
      * @param  string  $method
