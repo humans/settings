@@ -3,15 +3,21 @@
 namespace Humans\Settings\Laravel;
 
 use Humans\Settings\Settings as SettingsBag;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 class Settings
 {
     use ForwardsCalls;
 
-    public function __construct(SettingsBag $settingsBag)
+    protected $settingsBag;
+    protected $model;
+
+    public function __construct(SettingsBag $settingsBag, $model)
     {
         $this->settingsBag = $settingsBag;
+        $this->model = $model;
     }
 
     /**
@@ -19,20 +25,31 @@ class Settings
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return mixed
+     * @return void
      */
     public function set($key, $value)
     {
+        $this->update([$key => $value]);
     }
 
     /**
      * Save multiple values at the same time.
      *
      * @param array  $settingss
-     * @return mixed
+     * @return void
      */
     public function update($settings)
     {
+
+        Collection::make(
+            Arr::dot(
+                call_user_func(
+                    [get_class($this->settingsBag), 'withoutDefaults'], $settings
+                )->toDatabase()
+            )
+        )->each(function ($value, $key) {
+            $this->model->properties()->updateOrCreate(['key' => $key], ['value' => $value]);
+        });
     }
 
 

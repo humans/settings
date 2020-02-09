@@ -46,6 +46,8 @@ trait HasSettings
     /**
      * Update the settings withoiut forcing persistence on defaults.
      *
+     * @deprecated
+     *
      * @param  array  $settings
      * @return void
      */
@@ -84,7 +86,7 @@ trait HasSettings
     {
         $class = $this->getSettingsClass();
 
-        return new Settings(new $class($settings));
+        return new Settings(new $class($settings), $this);
     }
 
     /**
