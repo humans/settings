@@ -11,6 +11,6 @@ return [
      * The mapping of the models to the classes.
      */
     'classes' => [
-        App\Model::class => App\Settings\ModelSettings::class,
+        // App\Model::class => App\Settings\ModelSettings::class,
     ],
 ];

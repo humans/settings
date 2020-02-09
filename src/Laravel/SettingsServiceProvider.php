@@ -2,22 +2,24 @@
 
 namespace Humans\Settings\Laravel;
 
+use Illuminate\Support\Facades\App;
+
 class SettingsServiceProvider extends \Illuminate\Support\ServiceProvider
 {
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/config/laravel-settings.php',
-            'laravel-settings'
+            __DIR__ . '/config/settings.php',
+            'settings'
         );
     }
 
     public function boot()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/migrations');
 
         $this->publishes([
-            __DIR__ . '/config/laravel-settings.php' => config_path('humans/settings.php'),
+            __DIR__ . '/config/settings.php' => App::configPath('humans/settings.php'),
         ]);
 
         if ($this->app->runningInConsole()) {

@@ -67,7 +67,7 @@ trait HasSettings
     {
         $namespace = (new ReflectionClass($this))->getNamespaceName();
 
-        $settingsNamespace = Config::get('laravel-settings.namespace');
+        $settingsNamespace = Config::get('humans.settings.namespace');
 
         $class = class_basename($this) . 'Settings';
 
@@ -84,7 +84,7 @@ trait HasSettings
     {
         $class = $this->getSettingsClass();
 
-        return new $class($settings);
+        return new Settings(new $class($settings));
     }
 
     /**
