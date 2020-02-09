@@ -12,7 +12,7 @@ You can install the package via composer:
 composer require humans/settings
 ```
 
-## Standalone Usage
+## Usage
 
 A settings bag is a class where you can store your settings that can have fallback values if no explicit values where set. (i.e. persistence)
 
