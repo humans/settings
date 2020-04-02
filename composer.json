@@ -1,6 +1,6 @@
 {
     "name": "humans/settings",
-    "description": "Settings maangement.",
+    "description": "Class-based settings handler for PHP.",
     "type": "library",
     "license": "MIT",
     "authors": [
