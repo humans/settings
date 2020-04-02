@@ -2,7 +2,6 @@
 
 namespace Humans\Settings\Laravel\Commands;
 
-use Illuminate\Console\DetectsApplicationNamespace;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -10,8 +9,6 @@ use Illuminate\Support\Facades\File;
 
 class MakeSettingsCommand extends Command
 {
-    use DetectsApplicationNamespace;
-
     protected $signature = 'settings:make {name}';
 
     protected $description = 'Create a settings file.';
@@ -57,6 +54,6 @@ class MakeSettingsCommand extends Command
 
     protected function namespace()
     {
-        return $this->getAppNamespace() . Config::get('humans.settings.namespace');
+        return "App\\" . Config::get('humans.settings.namespace');
     }
 }
