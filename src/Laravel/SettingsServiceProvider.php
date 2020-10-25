@@ -18,7 +18,7 @@ class SettingsServiceProvider extends \Illuminate\Support\ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/config/settings.php' => App::configPath('humans/settings.php'),
-            __DIR__ . '/migrations/2019_01_01_100000_create_settings_table.php' => App::databasePath('2019_01_01_100000_create_settings_table.php'),
+            __DIR__ . '/migrations/2019_01_01_100000_create_settings_table.php' => App::databasePath('migrations/2019_01_01_100000_create_settings_table.php'),
         ]);
 
         if ($this->app->runningInConsole()) {
